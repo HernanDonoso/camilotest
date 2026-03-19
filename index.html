@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geografi – Jordytan förändras | Camilos studieapp</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --color-background-primary: #ffffff;
+    --color-background-secondary: #f5f4ef;
+    --color-text-primary: #1a1a18;
+    --color-text-secondary: #5f5e5a;
+    --color-border-tertiary: rgba(0,0,0,0.15);
+    --color-border-secondary: rgba(0,0,0,0.25);
+    --font-sans: system-ui, -apple-system, sans-serif;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-background-primary: #1e1e1c;
+      --color-background-secondary: #2a2a28;
+      --color-text-primary: #e8e6dc;
+      --color-text-secondary: #9c9a90;
+      --color-border-tertiary: rgba(255,255,255,0.12);
+      --color-border-secondary: rgba(255,255,255,0.22);
+    }
+  }
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-background-secondary);
+    color: var(--color-text-primary);
+    min-height: 100vh;
+    padding: 1.5rem 1rem;
+  }
+  .app {
+    max-width: 720px;
+    margin: 0 auto;
+    background: var(--color-background-primary);
+    border-radius: 16px;
+    border: 0.5px solid var(--color-border-tertiary);
+    padding: 1.5rem;
+  }
+  .nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .nav-btn { padding: 8px 16px; border-radius: 20px; border: 1.5px solid var(--color-border-secondary); background: var(--color-background-secondary); color: var(--color-text-primary); font-size: 14px; cursor: pointer; transition: all .2s; font-family: var(--font-sans); }
+  .nav-btn.active { background: #185FA5; color: #E6F1FB; border-color: #185FA5; font-weight: 500; }
+  .nav-btn:hover:not(.active) { border-color: #185FA5; }
+  .section { display: none; }
+  .section.visible { display: block; }
+  .topic-card { border: 0.5px solid var(--color-border-tertiary); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; background: var(--color-background-primary); }
+  .topic-title { font-size: 16px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 0.5rem; }
+  .topic-body { font-size: 14px; color: var(--color-text-secondary); line-height: 1.7; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 10px; border-radius: 10px; margin-bottom: 8px; }
+  .badge-blue   { background: #E6F1FB; color: #0C447C; }
+  .badge-amber  { background: #FAEEDA; color: #633806; }
+  .badge-teal   { background: #E1F5EE; color: #085041; }
+  .badge-coral  { background: #FAECE7; color: #712B13; }
+  .badge-purple { background: #EEEDFE; color: #3C3489; }
+  .fact-list { list-style: none; padding: 0; margin-top: 8px; }
+  .fact-list li { padding: 4px 0 4px 20px; position: relative; font-size: 14px; color: var(--color-text-secondary); line-height: 1.6; }
+  .fact-list li::before { content: "→"; position: absolute; left: 0; color: #185FA5; }
+  .quiz-q { border: 0.5px solid var(--color-border-tertiary); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; background: var(--color-background-primary); }
+  .quiz-q p { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 0.75rem; }
+  .opt { display: block; width: 100%; text-align: left; padding: 10px 14px; margin-bottom: 6px; border-radius: 8px; border: 1px solid var(--color-border-secondary); background: var(--color-background-secondary); color: var(--color-text-primary); font-size: 14px; cursor: pointer; transition: all .15s; font-family: var(--font-sans); }
+  .opt:hover:not(:disabled) { border-color: #185FA5; }
+  .opt.correct { background: #E1F5EE; border-color: #0F6E56; color: #085041; }
+  .opt.wrong   { background: #FCEBEB; border-color: #A32D2D; color: #501313; }
+  .feedback { font-size: 13px; margin-top: 6px; min-height: 18px; font-weight: 500; }
+  .score-bar { background: var(--color-background-secondary); border-radius: 8px; padding: 10px 14px; margin-bottom: 1rem; font-size: 14px; color: var(--color-text-secondary); display: flex; justify-content: space-between; align-items: center; }
+  .score-num { font-size: 18px; font-weight: 500; color: #185FA5; }
+  .reset-btn { padding: 8px 18px; border-radius: 20px; border: 1.5px solid #185FA5; background: transparent; color: #185FA5; font-size: 14px; cursor: pointer; font-family: var(--font-sans); }
+  .reset-btn:hover { background: #E6F1FB; }
+  .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 10px; margin-top: 0.75rem; }
+  .concept-cell { border-radius: 8px; padding: 10px; text-align: center; }
+  .concept-cell .label { font-size: 11px; font-weight: 500; margin-bottom: 4px; }
+  .concept-cell .val { font-size: 13px; }
+  h2 { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 1rem; }
+  svg text { font-family: var(--font-sans); }
+</style>
+</head>
+<body>
+<div class="app">
+  <div style="margin-bottom:1rem">
+    <div style="font-size:20px;font-weight:500;color:var(--color-text-primary)">🌍 Geografi – Jordytan förändras</div>
+    <div style="font-size:13px;color:var(--color-text-secondary);margin-top:2px">Camilos studieapp · 5:an</div>
+  </div>
+
+  <div class="nav">
+    <button class="nav-btn active" onclick="show('jordens-lager')">Jordens lager</button>
+    <button class="nav-btn" onclick="show('plattor')">Plattor &amp; Pangea</button>
+    <button class="nav-btn" onclick="show('krafter')">Inre &amp; yttre krafter</button>
+    <button class="nav-btn" onclick="show('jordskaly')">Jordbävning &amp; Vulkan</button>
+    <button class="nav-btn" onclick="show('landskap')">Landskap</button>
+    <button class="nav-btn" onclick="show('quiz')">🎯 Quiz</button>
+  </div>
+
+  <!-- SECTION 1: Jordens lager -->
+  <div class="section visible" id="jordens-lager">
+    <h2>Jordens lager</h2>
+    <svg width="100%" viewBox="0 0 680 320">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+      <circle cx="220" cy="160" r="140" fill="#B5D4F4" stroke="#185FA5" stroke-width="1.5"/>
+      <circle cx="220" cy="160" r="105" fill="#FAC775" stroke="#BA7517" stroke-width="1"/>
+      <circle cx="220" cy="160" r="65"  fill="#F09595" stroke="#A32D2D" stroke-width="1"/>
+      <circle cx="220" cy="160" r="32"  fill="#E24B4A" stroke="#791F1F" stroke-width="1.5"/>
+      <line x1="350" y1="40"  x2="290" y2="80"  stroke="#185FA5" stroke-width="0.5" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+      <text x="358" y="36" font-size="13" fill="#0C447C" font-weight="500">Jordskorpan</text>
+      <text x="358" y="52" font-size="11" fill="#185FA5">5–70 km tjock</text>
+      <line x1="380" y1="110" x2="310" y2="140" stroke="#BA7517" stroke-width="0.5" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+      <text x="388" y="106" font-size="13" fill="#633806" font-weight="500">Manteln</text>
+      <text x="388" y="122" font-size="11" fill="#BA7517">Trögflytande massa</text>
+      <line x1="370" y1="185" x2="295" y2="185" stroke="#A32D2D" stroke-width="0.5" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+      <text x="378" y="181" font-size="13" fill="#791F1F" font-weight="500">Yttre kärnan</text>
+      <text x="378" y="197" font-size="11" fill="#A32D2D">Flytande järn</text>
+      <line x1="360" y1="240" x2="245" y2="205" stroke="#791F1F" stroke-width="0.5" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+      <text x="368" y="236" font-size="13" fill="#501313" font-weight="500">Inre kärnan</text>
+      <text x="368" y="252" font-size="11" fill="#791F1F">Fast järn, ~5000°C</text>
+      <rect x="20" y="255" width="185" height="52" rx="8" fill="none" stroke="#cccccc" stroke-width="0.5"/>
+      <text x="112" y="272" font-size="12" fill="#5f5e5a" text-anchor="middle">🍑 Tänk som en persika:</text>
+      <text x="112" y="288" font-size="11" fill="#5f5e5a" text-anchor="middle">Skalet = jordskorpan</text>
+      <text x="112" y="302" font-size="11" fill="#5f5e5a" text-anchor="middle">Kärnan = stenen inuti</text>
+    </svg>
+    <div class="topic-card">
+      <span class="badge badge-blue">Viktigt att kunna</span>
+      <ul class="fact-list">
+        <li><strong>Jordskorpan</strong> – det yttersta lagret, 5–70 km tjockt. Vi bor här!</li>
+        <li><strong>Manteln</strong> – tjockast lager, trögflytande massa med mineraler. Kallas magma i flytande form.</li>
+        <li><strong>Yttre kärnan</strong> – flytande järn och nickel</li>
+        <li><strong>Inre kärnan</strong> – fast järn, nästan 5 000 grader varmt</li>
+        <li>Jordskorpan liknar skalet på en persika – tunn jämfört med resten</li>
+        <li>I Sverige borrade man 13 km – men kom inte ens nära manteln!</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SECTION 2: Plattor & Pangea -->
+  <div class="section" id="plattor">
+    <h2>Kontinentalplattorna &amp; Pangea</h2>
+    <div class="topic-card">
+      <span class="badge badge-amber">Pangea – superkontinenten</span>
+      <div class="topic-body">För <strong>200 miljoner år sedan</strong> hängde alla kontinenter ihop i en enda superkontinent – Pangea. Det betyder "all land" på grekiska.</div>
+      <div class="concept-grid" style="margin-top:12px">
+        <div class="concept-cell" style="background:#FAEEDA;"><div class="label" style="color:#633806">200 milj. år sedan</div><div class="val" style="color:#854F0B;font-size:12px">Alla ihop = Pangea</div></div>
+        <div class="concept-cell" style="background:#E1F5EE;"><div class="label" style="color:#085041">100 milj. år sedan</div><div class="val" style="color:#0F6E56;font-size:12px">Börjar dela sig</div></div>
+        <div class="concept-cell" style="background:#E6F1FB;"><div class="label" style="color:#0C447C">50 milj. år sedan</div><div class="val" style="color:#185FA5;font-size:12px">Sprickar upp mer</div></div>
+        <div class="concept-cell" style="background:#EEEDFE;"><div class="label" style="color:#3C3489">Idag</div><div class="val" style="color:#534AB7;font-size:12px">7 kontinenter</div></div>
+      </div>
+    </div>
+    <div class="topic-card">
+      <span class="badge badge-teal">Plattektonik</span>
+      <ul class="fact-list">
+        <li>Jordskorpan är uppdelad i stora <strong>plattor</strong> som rör sig några centimeter per år</li>
+        <li>Plattorna flyter på manteln – strömmar i manteln driver rörelsen</li>
+        <li>Plattorna rör sig isär, mot varandra, eller längs med varandra</li>
+        <li>Atlantens botten sprider sig – Europa och USA rör sig ifrån varandra!</li>
+        <li>Korallrev på Gotland visar att Sverige en gång låg i tropikerna</li>
+        <li>Afrikaplattan rör sig norrut ~3 meter per 30 år</li>
+      </ul>
+    </div>
+    <div class="topic-card">
+      <span class="badge badge-purple">Skillnad: Världsdel vs Kontinent?</span>
+      <div class="topic-body">Världsdelar (t.ex. Europa) är mer en mänsklig indelning. Kontinenter är de stora landmassorna. Asien och Europa är egentligen samma kontinent – Eurasien!</div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: Inre & yttre krafter -->
+  <div class="section" id="krafter">
+    <h2>Inre och yttre krafter</h2>
+    <div class="topic-card">
+      <span class="badge badge-coral">Inre krafter – plattor krockar</span>
+      <ul class="fact-list">
+        <li><strong>Plattor krockar</strong> → bergkedjor bildas (t.ex. Himalaya!)</li>
+        <li>En tung oceankratta trycks ner under en lättare platta → vulkaner</li>
+        <li><strong>Plattor glider isär</strong> → magma stiger upp och bildar ny skorpa</li>
+        <li><strong>Plattor glider längs med varandra</strong> → jordbävningar (kallas förkastning)</li>
+        <li>Himalaya bildades när Indien krock med den eurasiska plattan</li>
+        <li>Bergskedjan Anderna = Sydamerika och oceanska plattan krockar</li>
+      </ul>
+    </div>
+    <svg width="100%" viewBox="0 0 680 200">
+      <defs>
+        <marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+      <rect x="30"  y="80" width="160" height="50" rx="6" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+      <rect x="210" y="80" width="160" height="50" rx="6" fill="#C0DD97" stroke="#3B6D11" stroke-width="1"/>
+      <text x="110" y="109" font-size="12" fill="#0C447C" text-anchor="middle" font-weight="500">Platta A</text>
+      <text x="290" y="109" font-size="12" fill="#27500A" text-anchor="middle" font-weight="500">Platta B</text>
+      <line x1="190" y1="105" x2="215" y2="105" stroke="#185FA5" stroke-width="2" marker-end="url(#arr2)"/>
+      <line x1="210" y1="105" x2="185" y2="105" stroke="#3B6D11" stroke-width="2" marker-end="url(#arr2)"/>
+      <text x="200" y="155" font-size="11" fill="#5f5e5a" text-anchor="middle">Krockar → bergkedja</text>
+      <polygon points="200,65 175,82 225,82" fill="#E24B4A" stroke="#A32D2D" stroke-width="1"/>
+      <text x="200" y="58" font-size="10" fill="#791F1F" text-anchor="middle">⛰️ berg</text>
+      <rect x="400" y="80" width="130" height="50" rx="6" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+      <rect x="550" y="80" width="110" height="50" rx="6" fill="#C0DD97" stroke="#3B6D11" stroke-width="1"/>
+      <text x="465" y="109" font-size="12" fill="#0C447C" text-anchor="middle" font-weight="500">Platta A</text>
+      <text x="605" y="109" font-size="12" fill="#27500A" text-anchor="middle" font-weight="500">Platta B</text>
+      <line x1="395" y1="105" x2="370" y2="105" stroke="#185FA5" stroke-width="2" marker-end="url(#arr2)"/>
+      <line x1="552" y1="105" x2="577" y2="105" stroke="#3B6D11" stroke-width="2" marker-end="url(#arr2)"/>
+      <text x="490" y="58"  font-size="10" fill="#A32D2D" text-anchor="middle">🌋 magma stiger upp</text>
+      <text x="490" y="155" font-size="11" fill="#5f5e5a" text-anchor="middle">Glider isär → vulkaner</text>
+    </svg>
+    <div class="topic-card">
+      <span class="badge badge-blue">Yttre krafter – vind &amp; vatten</span>
+      <ul class="fact-list">
+        <li><strong>Erosion</strong> = vatten, vind och is sliter sönder berg och sten</li>
+        <li>Floder transporterar sand och grus nerför – bildar <strong>delta</strong> vid mynningen</li>
+        <li><strong>Mekanisk vittring</strong> = vatten fryser i sprickor och spränger sönder berg (frostsprängning)</li>
+        <li><strong>Kemisk vittring</strong> = surt vatten löser upp kalksten → grottor bildas (t.ex. Lummelundagrottorna på Gotland!)</li>
+        <li>Vind blåser sand och bildar sanddyner – vanligast i öknar</li>
+        <li>Växter håller kvar jord med sina rötter – minskar erosion</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SECTION 4: Jordbävning & Vulkan -->
+  <div class="section" id="jordskaly">
+    <h2>Jordbävningar &amp; Vulkaner</h2>
+    <div class="topic-card">
+      <span class="badge badge-coral">Jordbävningar</span>
+      <ul class="fact-list">
+        <li>Uppstår när plattor glider längs med varandra och rör sig häftigt</li>
+        <li>Vanligast vid plattgränser – t.ex. Japan och Turkiet</li>
+        <li>Mäts med <strong>seismograf</strong> (instrument)</li>
+        <li>Leder ibland till <strong>tsunami</strong> – enorma havsvågor</li>
+        <li>2011 i Japan: jordbävning → tsunami → tusentals dog</li>
+        <li>I Sverige har vi jordskalv men de är mycket svaga – vi märker dem knappt</li>
+      </ul>
+    </div>
+    <div class="topic-card">
+      <span class="badge badge-amber">Vulkaner</span>
+      <ul class="fact-list">
+        <li>Bildas där plattor glider isär eller krockar</li>
+        <li>Magma tränger upp → lava flödar ut</li>
+        <li><strong>Stratovulkan</strong> = hög och spetsig (t.ex. Vesuvius) – farligast, exploderar</li>
+        <li><strong>Sköldvulkan</strong> = bred och låg (t.ex. Hawaii) – lava rinner lugnt</li>
+        <li>Jord nära vulkaner = väldigt bördig (bra jordbruk!)</li>
+        <li><strong>Pompeji</strong> – stad begravd under aska år 79 e.Kr. när Vesuvius bröt ut</li>
+        <li>Island har sköldvulkaner – bildades av att plattor glider isär</li>
+      </ul>
+    </div>
+    <div class="topic-card" style="border-color:#FAC775">
+      <span class="badge badge-amber">Kom ihåg skillnaden!</span>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
+        <div style="background:#FAEEDA;border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:24px">🌋</div>
+          <div style="font-size:13px;font-weight:500;color:#633806">Stratovulkan</div>
+          <div style="font-size:12px;color:#854F0B">Hög, spetsig, farlig<br>Ex: Vesuvius</div>
+        </div>
+        <div style="background:#E1F5EE;border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:24px">🏔️</div>
+          <div style="font-size:13px;font-weight:500;color:#085041">Sköldvulkan</div>
+          <div style="font-size:12px;color:#0F6E56">Bred, låg, lugn<br>Ex: Hawaii</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: Landskap -->
+  <div class="section" id="landskap">
+    <h2>Landskap</h2>
+    <div class="topic-card">
+      <span class="badge badge-teal">Naturlandskap vs Kulturlandskap</span>
+      <div class="topic-body" style="margin-bottom:10px">Landskapet formas av både <strong>inre krafter</strong> (plattornas rörelser) och <strong>yttre krafter</strong> (vind, vatten, is).</div>
+      <ul class="fact-list">
+        <li><strong>Naturlandskap</strong> = landskap som <em>inte</em> förändrats av människan</li>
+        <li><strong>Kulturlandskap</strong> = landskap som människan förändrat (städer, odlingar, vägar)</li>
+        <li>Idag är nästan all natur på något sätt påverkad av människan</li>
+        <li>Exempel: stenbrott i Bulgarien – maskiner hackar loss sten</li>
+        <li>Exempel: tunnel sprängd genom berg för trafik</li>
+        <li>Människan är en <strong>exogen kraft</strong> – en yttre kraft som förändrar jordytan</li>
+      </ul>
+    </div>
+    <div class="topic-card" style="border-color:#9FE1CB">
+      <span class="badge badge-teal">Snabbkoll – begrepp</span>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <div style="background:#E1F5EE;border-radius:8px;padding:8px"><div style="font-size:12px;font-weight:500;color:#085041">Endogena krafter</div><div style="font-size:11px;color:#0F6E56">Inre krafter (plattor, vulkaner)</div></div>
+        <div style="background:#E6F1FB;border-radius:8px;padding:8px"><div style="font-size:12px;font-weight:500;color:#0C447C">Exogena krafter</div><div style="font-size:11px;color:#185FA5">Yttre krafter (vind, vatten, is, människan)</div></div>
+        <div style="background:#FAEEDA;border-radius:8px;padding:8px"><div style="font-size:12px;font-weight:500;color:#633806">Erosion</div><div style="font-size:11px;color:#854F0B">Nedbrytning av berg/sten</div></div>
+        <div style="background:#FAECE7;border-radius:8px;padding:8px"><div style="font-size:12px;font-weight:500;color:#712B13">Vittring</div><div style="font-size:11px;color:#993C1D">Mekanisk eller kemisk sönderdelning</div></div>
+        <div style="background:#EEEDFE;border-radius:8px;padding:8px"><div style="font-size:12px;font-weight:500;color:#3C3489">Delta</div><div style="font-size:11px;color:#534AB7">Sand/grus vid flodens mynning</div></div>
+        <div style="background:#EAF3DE;border-radius:8px;padding:8px"><div style="font-size:12px;font-weight:500;color:#27500A">Magma / Lava</div><div style="font-size:11px;color:#3B6D11">Flytande sten inne/ute</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: Quiz -->
+  <div class="section" id="quiz">
+    <div class="score-bar">
+      <span>Dina poäng: <span class="score-num" id="score-display">0 / 15</span></span>
+      <button class="reset-btn" onclick="resetQuiz()">Börja om</button>
+    </div>
+    <div id="quiz-container"></div>
+  </div>
+</div>
+
+<script>
+const questions = [
+  { q: "Vilket lager i jorden bor vi på?", opts: ["Manteln","Inre kärnan","Jordskorpan","Yttre kärnan"], ans: 2, hint: "Vi bor på det yttersta lagret – tunnt som ett persikoskal!" },
+  { q: "Vad heter superkontinenten som fanns för 200 miljoner år sedan?", opts: ["Gondwana","Laurasia","Pangea","Eurasien"], ans: 2, hint: "Pangea betyder 'all land' på grekiska." },
+  { q: "Vad kallas det när vatten fryser i sprickor och spränger sönder berg?", opts: ["Kemisk vittring","Erosion","Frostsprängning","Jordbävning"], ans: 2, hint: "Det är ett typ av mekanisk vittring." },
+  { q: "Vilken vulkantyp är hög, spetsig och farligast?", opts: ["Sköldvulkan","Stratovulkan","Magmavulkan","Havsbergvulkan"], ans: 1, hint: "Vesuvius är ett exempel på denna sort." },
+  { q: "Vad mäter en seismograf?", opts: ["Vulkanutbrott","Jordbävningar","Erosion","Plattornas rörelse"], ans: 1, hint: "Den känner av skakvågor i marken." },
+  { q: "Hur heter det fenomenet när plattor glider isär och magma stiger upp?", opts: ["Bergbildning","Förkastning","Spridningszoner","Subduktion"], ans: 2, hint: "Det händer t.ex. mitt i Atlanten!" },
+  { q: "Vad kallas landskap som INTE förändrats av människan?", opts: ["Kulturlandskap","Exogen zon","Naturlandskap","Endogen yta"], ans: 2, hint: "Det är det 'naturliga' alternativet." },
+  { q: "Var bildades Himalaya?", opts: ["Pangea delades","Indien krock med Eurasiska plattan","Sköldvulkaner sprack","Oceansk platta smälte"], ans: 1, hint: "Två kontinentalplattor krock och bergkedjan veckades upp!" },
+  { q: "Vad kallas flytande sten INUTI jordens inre?", opts: ["Lava","Magma","Mineral","Basalt"], ans: 1, hint: "När den kommer ut ur en vulkan byter den namn." },
+  { q: "Vilken stad begravdes av askregn år 79 e.Kr.?", opts: ["Rom","Athen","Pompeji","Kartago"], ans: 2, hint: "Staden låg nära vulkanen Vesuvius i Italien." },
+  { q: "Vad kallas det när surt vatten löser upp kalksten och bildar grottor?", opts: ["Mekanisk vittring","Frostsprängning","Kemisk vittring","Erosion"], ans: 2, hint: "Lummelundagrottorna på Gotland bildades så!" },
+  { q: "Hur stor del av jordens yta täcks av plattor som delvis ligger under havet?", opts: ["De flesta plattor","Inga plattor","Bara polplattorna","Bara oceanska plattor"], ans: 0, hint: "Plattorna täcker hela jordskorpan – land och hav." },
+  { q: "Vad är en endogen kraft?", opts: ["En yttre kraft som vind","En inre kraft som plattektonik","Erosion","Mänsklig påverkan"], ans: 1, hint: "Endo = inifrån. Tänk plattor och vulkaner." },
+  { q: "Vad kallas det lager i mitten av jorden som är fast och extremt varmt?", opts: ["Yttre kärnan","Manteln","Jordskorpan","Inre kärnan"], ans: 3, hint: "Nästan 5 000 grader varmt och består av fast järn." },
+  { q: "Vad händer när sand och grus samlas där en flod mynnar ut i havet?", opts: ["Stenbrott bildas","Erosion sker","Delta bildas","Bergkedja skapas"], ans: 2, hint: "Tänk på Nilens mynning i Egypten!" }
+];
+
+let answered = new Array(questions.length).fill(null);
+let score = 0;
+
+function buildQuiz() {
+  const c = document.getElementById('quiz-container');
+  c.innerHTML = '';
+  questions.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'quiz-q';
+    div.id = 'q' + i;
+    let optsHtml = q.opts.map((o, j) =>
+      `<button class="opt${answered[i]===j ? (j===q.ans?' correct':' wrong') : ''}"
+       onclick="answer(${i},${j})" ${answered[i]!==null?'disabled':''}>${o}</button>`
+    ).join('');
+    div.innerHTML = `<p>${i+1}. ${q.q}</p>${optsHtml}
+      <div class="feedback" style="color:${answered[i]===q.ans?'#0F6E56':'#A32D2D'}">
+        ${answered[i]!==null ? (answered[i]===q.ans ? '✓ Rätt! '+q.hint : '✗ Fel. '+q.hint) : ''}
+      </div>`;
+    c.appendChild(div);
+  });
+  document.getElementById('score-display').textContent = score + ' / ' + questions.length;
+}
+
+function answer(qi, ai) {
+  if (answered[qi] !== null) return;
+  answered[qi] = ai;
+  if (ai === questions[qi].ans) score++;
+  buildQuiz();
+  document.getElementById('q'+qi).scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function resetQuiz() {
+  answered = new Array(questions.length).fill(null);
+  score = 0;
+  buildQuiz();
+}
+
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.getElementById(id).classList.add('visible');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const map = {'jordens-lager':0,'plattor':1,'krafter':2,'jordskaly':3,'landskap':4,'quiz':5};
+  document.querySelectorAll('.nav-btn')[map[id]]?.classList.add('active');
+  if (id === 'quiz') buildQuiz();
+}
+</script>
+</body>
+</html>
